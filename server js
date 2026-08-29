@@ -1,0 +1,70 @@
+require("dotenv").config();
+
+const express = require("express");
+const cors = require("cors");
+
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+app.use(cors());
+app.use(express.json());
+
+app.get("/", (req, res) => {
+  res.json({
+    success: true,
+    message: "Xelz Backend is running",
+    version: "1.0.0"
+  });
+});
+
+app.get("/api/health", (req, res) => {
+  res.json({
+    success: true,
+    status: "healthy",
+    service: "Xelz Store API"
+  });
+});
+
+app.get("/api/products", (req, res) => {
+  res.json({
+    success: true,
+    products: []
+  });
+});
+
+app.post("/api/orders", (req, res) => {
+  const { customer, items, amount } = req.body;
+
+  if (!customer || !items || !amount) {
+    return res.status(400).json({
+      success: false,
+      message: "Customer, items and amount are required"
+    });
+  }
+
+  const order = {
+    id: "XZ-" + Date.now(),
+    customer,
+    items,
+    amount,
+    status: "pending",
+    createdAt: new Date().toISOString()
+  };
+
+  res.status(201).json({
+    success: true,
+    message: "Order created successfully",
+    order
+  });
+});
+
+app.use((req, res) => {
+  res.status(404).json({
+    success: false,
+    message: "Xelz API endpoint not found"
+  });
+});
+
+app.listen(PORT, () => {
+  console.log(`Xelz Backend running on port ${PORT}`);
+});
